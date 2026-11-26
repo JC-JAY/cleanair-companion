@@ -1,0 +1,56 @@
+services:
+  # ── Backend API ─────────────────────────────────────────────────────────────
+  - type: web
+    name: cleanair-backend
+    env: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/v1/health/
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: SECRET_KEY
+        generateValue: true
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: DATABASE_URL
+        fromDatabase:
+          name: cleanair-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: cleanair-redis
+          property: connectionString
+
+  # ── Frontend (Static Site) ──────────────────────────────────────────────────
+  - type: web
+    name: cleanair-frontend
+    env: static
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist/cleanair-companion/browser
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+databases:
+  # ── PostgreSQL with pgvector ───────────────────────────────────────────────
+  - name: cleanair-db
+    databaseName: cleanair
+    user: cleanair
+    plan: free
+
+  # ── Redis ───────────────────────────────────────────────────────────────────
+  - name: cleanair-redis
+    type: redis
+    plan: free
+    ipAllowList: []
