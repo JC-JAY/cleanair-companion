@@ -1,9 +1,9 @@
-"""Database session factory — async PostgreSQL + Redis connections."""
+"""Database session factory — async PostgreSQL + resilient cache."""
 from __future__ import annotations
 
-from typing import AsyncGenerator
+import time
+from typing import Any, AsyncGenerator
 
-from redis.asyncio import Redis, from_url
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
 from app.core.config import settings
@@ -24,7 +24,40 @@ AsyncSessionLocal = async_sessionmaker(
     autocommit=False,
 )
 
-redis_client: Redis = from_url(settings.REDIS_URL, decode_responses=True)
+
+class InMemoryCache:
+    """In-memory cache fallback when Redis is not deployed."""
+
+    def __init__(self):
+        self._data: dict[str, tuple[str, float]] = {}
+
+    async def get(self, key: str) -> str | None:
+        if key in self._data:
+            val, expires = self._data[key]
+            if time.time() < expires:
+                return val
+            del self._data[key]
+        return None
+
+    async def setex(self, key: str, ttl_seconds: int, value: str) -> None:
+        self._data[key] = (value, time.time() + ttl_seconds)
+
+    async def aclose(self) -> None:
+        self._data.clear()
+
+
+# Initialize Redis if configured, otherwise fallback to in-memory cache
+def _init_cache():
+    if settings.REDIS_URL and not settings.REDIS_URL.startswith("none"):
+        try:
+            from redis.asyncio import from_url
+            return from_url(settings.REDIS_URL, decode_responses=True)
+        except Exception:
+            return InMemoryCache()
+    return InMemoryCache()
+
+
+redis_client = _init_cache()
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
@@ -35,6 +68,5 @@ async def get_db() -> AsyncGenerator[AsyncSession, None]:
             await session.close()
 
 
-async def get_redis() -> Redis:
+async def get_redis():
     return redis_client
-

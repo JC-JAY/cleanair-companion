@@ -24,11 +24,6 @@ services:
         fromDatabase:
           name: cleanair-db
           property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: cleanair-redis
-          property: connectionString
 
   # ── Frontend (Static Site) ──────────────────────────────────────────────────
   - type: web
@@ -48,9 +43,3 @@ databases:
     databaseName: cleanair
     user: cleanair
     plan: free
-
-  # ── Redis ───────────────────────────────────────────────────────────────────
-  - name: cleanair-redis
-    type: redis
-    plan: free
-    ipAllowList: []
