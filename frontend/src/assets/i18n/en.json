@@ -1,0 +1,74 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "dailyPlan": "Today's Plan",
+    "chat": "AI Assistant",
+    "community": "Community",
+    "alerts": "Alerts",
+    "settings": "Settings",
+    "logout": "Logout"
+  },
+  "dashboard": {
+    "airQuality": "Current Air Quality",
+    "viewPlan": "View Today's Plan",
+    "askAssistant": "Ask Assistant",
+    "bestTime": "Best Time Windows",
+    "askAI": "Ask AI",
+    "community": "My Community",
+    "indoorTips": "Quick Indoor Tips",
+    "inversionWarning": "Temperature inversion detected — pollution may be trapped at ground level today."
+  },
+  "chat": {
+    "title": "CleanAir Assistant",
+    "subtitle": "Ask me anything about air quality, indoor air, masks, or health impacts",
+    "placeholder": "Ask a question...",
+    "send": "Send",
+    "thinking": "Thinking..."
+  },
+  "tips": {
+    "closeWindowsMorning": "Keep windows closed between 6–10 am (worst pollution window in winter)",
+    "useKitchenExhaust": "Always use kitchen exhaust fan while cooking",
+    "avoidIncenseSmoke": "Avoid burning incense, agarbatti or dhoop indoors",
+    "plantsModerateBenefit": "Indoor plants can help slightly — spider plant, peace lily, snake plant"
+  },
+  "common": {
+    "disclaimer": "This app provides general air quality guidance only. It is NOT medical advice. Consult a doctor for health concerns.",
+    "chatDisclaimer": "AI responses are grounded in WHO/CPCB guidelines. Not medical advice.",
+    "loading": "Loading...",
+    "error": "Something went wrong. Please try again.",
+    "offline": "You are offline. Showing last known data."
+  },
+  "onboarding": {
+    "title": "Welcome to CleanAir Companion",
+    "subtitle": "Help us personalise your clean-air plan",
+    "step1": "Your Location",
+    "step2": "Your Household",
+    "step3": "Your Home & Commute",
+    "step4": "Available Devices",
+    "useGPS": "Use my location",
+    "manualCity": "Enter city manually",
+    "next": "Next",
+    "back": "Back",
+    "finish": "Get My Plan"
+  },
+  "plan": {
+    "title": "Today's Clean Air Plan",
+    "bestWindow": "Best outdoor window",
+    "avoidWindow": "Avoid outdoors",
+    "recommendations": "Recommendations",
+    "indoorHacks": "Indoor Air Hacks",
+    "impact": "Your Impact Today",
+    "pm25Saved": "PM2.5 exposure saved",
+    "co2Saved": "CO₂e avoided",
+    "confidence": "Confidence"
+  },
+  "aqi": {
+    "good": "Good",
+    "satisfactory": "Satisfactory",
+    "moderate": "Moderate",
+    "poor": "Poor",
+    "veryPoor": "Very Poor",
+    "severe": "Severe"
+  }
+}
+

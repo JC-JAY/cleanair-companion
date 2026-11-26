@@ -1,0 +1,37 @@
+{
+  "name": "CleanAir Companion",
+  "short_name": "CleanAir",
+  "description": "GenAI-powered assistant for navigating urban air pollution",
+  "theme_color": "#2e7d32",
+  "background_color": "#f1f8e9",
+  "display": "standalone",
+  "start_url": "/dashboard",
+  "scope": "/",
+  "orientation": "portrait-primary",
+  "lang": "en",
+  "icons": [
+    { "src": "assets/icons/icon-72x72.png", "sizes": "72x72", "type": "image/png" },
+    { "src": "assets/icons/icon-96x96.png", "sizes": "96x96", "type": "image/png" },
+    { "src": "assets/icons/icon-128x128.png", "sizes": "128x128", "type": "image/png" },
+    { "src": "assets/icons/icon-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "assets/icons/icon-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "categories": ["health", "environment", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Today's Plan",
+      "short_name": "Plan",
+      "description": "View today's clean-air plan",
+      "url": "/plan",
+      "icons": [{ "src": "assets/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Ask Assistant",
+      "short_name": "Chat",
+      "description": "Ask the AI assistant",
+      "url": "/chat",
+      "icons": [{ "src": "assets/icons/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ]
+}
+
