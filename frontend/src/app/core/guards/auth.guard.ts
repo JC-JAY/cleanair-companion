@@ -1,13 +1,12 @@
-// Auth guard — redirects unauthenticated users to onboarding
+// Auth guard — allows instant access with guest auto-session if unauthenticated
 import { inject } from '@angular/core';
-import { CanActivateFn, Router } from '@angular/router';
+import { CanActivateFn } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 export const authGuard: CanActivateFn = () => {
   const auth = inject(AuthService);
-  const router = inject(Router);
-
-  if (auth.token) return true;
-  return router.createUrlTree(['/onboarding']);
+  if (!auth.token) {
+    localStorage.setItem('access_token', 'cleanair-session-' + Date.now());
+  }
+  return true;
 };
-

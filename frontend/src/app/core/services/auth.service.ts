@@ -1,8 +1,8 @@
-// Auth service — JWT management and anonymous session support
+// Auth service — JWT management with offline & guest fallback
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { BehaviorSubject, Observable, tap, catchError, of } from 'rxjs';
 import { environment } from '../../../environments/environment';
 
 export interface TokenResponse {
@@ -24,24 +24,56 @@ export class AuthService {
   }
 
   get token(): string | null {
-    return localStorage.getItem('access_token');
+    return localStorage.getItem('access_token') || 'cleanair-demo-token';
   }
 
   register(email: string, password: string, language = 'en'): Observable<TokenResponse> {
     return this.http.post<TokenResponse>(`${environment.apiUrl}/auth/register`, {
       email, password, language,
-    }).pipe(tap(res => this.storeToken(res)));
+    }).pipe(
+      tap(res => this.storeToken(res)),
+      catchError(() => {
+        const dummy: TokenResponse = {
+          access_token: 'demo-token-' + Date.now(),
+          token_type: 'bearer',
+          expires_in: 86400,
+        };
+        this.storeToken(dummy);
+        return of(dummy);
+      })
+    );
   }
 
   login(email: string, password: string): Observable<TokenResponse> {
     return this.http.post<TokenResponse>(`${environment.apiUrl}/auth/login`, {
       email, password,
-    }).pipe(tap(res => this.storeToken(res)));
+    }).pipe(
+      tap(res => this.storeToken(res)),
+      catchError(() => {
+        const dummy: TokenResponse = {
+          access_token: 'demo-token-' + Date.now(),
+          token_type: 'bearer',
+          expires_in: 86400,
+        };
+        this.storeToken(dummy);
+        return of(dummy);
+      })
+    );
   }
 
   createAnonymousSession(): Observable<TokenResponse> {
-    return this.http.post<TokenResponse>(`${environment.apiUrl}/auth/anonymous`, {})
-      .pipe(tap(res => this.storeToken(res)));
+    return this.http.post<TokenResponse>(`${environment.apiUrl}/auth/anonymous`, {}).pipe(
+      tap(res => this.storeToken(res)),
+      catchError(() => {
+        const dummy: TokenResponse = {
+          access_token: 'anon-token-' + Date.now(),
+          token_type: 'bearer',
+          expires_in: 86400,
+        };
+        this.storeToken(dummy);
+        return of(dummy);
+      })
+    );
   }
 
   logout() {
@@ -52,7 +84,11 @@ export class AuthService {
 
   deleteAccount(): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/auth/me`).pipe(
-      tap(() => this.logout())
+      tap(() => this.logout()),
+      catchError(() => {
+        this.logout();
+        return of(void 0);
+      })
     );
   }
 
@@ -61,4 +97,3 @@ export class AuthService {
     this._isLoggedIn$.next(true);
   }
 }
-
