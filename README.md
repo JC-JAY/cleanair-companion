@@ -26,7 +26,7 @@
 | Layer | Technology |
 |---|---|
 | Backend | Python 3.12 · FastAPI · SQLAlchemy (async) · Alembic · Pydantic v2 |
-| AI | Anthropic Claude API (tool-use, structured JSON) · OpenAI text-embedding-3-small |
+| AI | Google Gemini API (Gemini 1.5 Pro / Flash, structured JSON outputs, function calling) · Google text-embedding-004 · Anthropic Claude (alternative provider) |
 | RAG | pgvector HNSW index · cosine similarity |
 | Frontend | Angular 18 · Angular Material · PWA / ngsw |
 | DB | PostgreSQL 16 + pgvector |

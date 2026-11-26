@@ -34,10 +34,13 @@ class Settings(BaseSettings):
     AQI_CACHE_TTL_SECONDS: int = 300          # 5 minutes
     PLAN_CACHE_TTL_SECONDS: int = 86400       # 24 hours
 
-    # ── AI ────────────────────────────────────────────────────────────────────
-    ANTHROPIC_API_KEY: SecretStr = Field(..., description="Anthropic Claude API key")
+    # ── AI (Google Gemini & multi-provider) ──────────────────────────────────
+    GEMINI_API_KEY: SecretStr = Field(default=SecretStr(""), description="Google Gemini API key")
+    GEMINI_MODEL: str = "gemini-1.5-flash"
+    GEMINI_EMBEDDING_MODEL: str = "models/text-embedding-004"
+    ANTHROPIC_API_KEY: SecretStr = Field(default=SecretStr(""), description="Anthropic Claude API key")
     ANTHROPIC_MODEL: str = "claude-sonnet-4-5"
-    OPENAI_API_KEY: SecretStr = Field(..., description="OpenAI key for embeddings")
+    OPENAI_API_KEY: SecretStr = Field(default=SecretStr(""), description="OpenAI key for embeddings")
     EMBEDDING_MODEL: str = "text-embedding-3-small"
     EMBEDDING_DIMENSIONS: int = 1536
     RAG_TOP_K: int = 8
