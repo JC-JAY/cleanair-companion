@@ -2,12 +2,22 @@
 from __future__ import annotations
 
 import pytest
-from httpx import AsyncClient
+from fastapi.testclient import TestClient
 from unittest.mock import AsyncMock, patch
 
 from app.main import app
+from app.db.session import get_db, get_redis
+from app.core.security import get_current_user_optional
 from app.schemas.aqi import AQIResponse, AQISource
 from datetime import datetime, timezone
+
+# Override DB and Redis dependencies for isolated integration tests
+async def _dummy_db():
+    yield None
+
+app.dependency_overrides[get_db] = _dummy_db
+app.dependency_overrides[get_redis] = lambda: None
+app.dependency_overrides[get_current_user_optional] = lambda: None
 
 
 @pytest.fixture
@@ -29,12 +39,11 @@ def mock_aqi_response():
     )
 
 
-@pytest.mark.asyncio
-async def test_aqi_endpoint_returns_data(mock_aqi_response):
+def test_aqi_endpoint_returns_data(mock_aqi_response):
     with patch("app.services.aqi.service.AQIService.get_aqi", new_callable=AsyncMock) as mock_get:
         mock_get.return_value = mock_aqi_response
-        async with AsyncClient(app=app, base_url="http://test") as client:
-            response = await client.get("/api/v1/aqi/?lat=18.52&lon=73.85")
+        with TestClient(app) as client:
+            response = client.get("/api/v1/aqi/?lat=18.52&lon=73.85")
     assert response.status_code == 200
     data = response.json()
     assert data["aqi"] == 185
@@ -42,35 +51,31 @@ async def test_aqi_endpoint_returns_data(mock_aqi_response):
     assert data["aqi_category"] == "Moderate"
 
 
-@pytest.mark.asyncio
-async def test_aqi_endpoint_validates_latitude():
-    async with AsyncClient(app=app, base_url="http://test") as client:
-        response = await client.get("/api/v1/aqi/?lat=200&lon=73.85")
-    assert response.status_code == 422  # validation error
+def test_aqi_endpoint_validates_latitude():
+    with TestClient(app) as client:
+        response = client.get("/api/v1/aqi/?lat=200&lon=73.85")
+    assert response.status_code == 422
 
 
-@pytest.mark.asyncio
-async def test_aqi_category_endpoint():
-    async with AsyncClient(app=app, base_url="http://test") as client:
-        response = await client.get("/api/v1/aqi/category?aqi=250")
+def test_aqi_category_endpoint():
+    with TestClient(app) as client:
+        response = client.get("/api/v1/aqi/category?aqi=250")
     assert response.status_code == 200
     data = response.json()
     assert data["category"] == "Poor"
     assert "hex_color" in data
 
 
-@pytest.mark.asyncio
-async def test_health_endpoint():
-    async with AsyncClient(app=app, base_url="http://test") as client:
-        response = await client.get("/api/v1/health/")
+def test_health_endpoint():
+    with TestClient(app) as client:
+        response = client.get("/api/v1/health/")
     assert response.status_code == 200
     assert response.json()["status"] == "ok"
 
 
-@pytest.mark.asyncio
-async def test_impact_commute_endpoint():
-    async with AsyncClient(app=app, base_url="http://test") as client:
-        response = await client.post("/api/v1/impact/commute", json={
+def test_impact_commute_endpoint():
+    with TestClient(app) as client:
+        response = client.post("/api/v1/impact/commute", json={
             "from_mode": "car_petrol",
             "to_mode": "metro",
             "distance_km": 10,

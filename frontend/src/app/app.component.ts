@@ -26,6 +26,7 @@ import { AqiBadgeComponent } from './shared/components/aqi-badge/aqi-badge.compo
     AqiBadgeComponent,
   ],
   template: `
+    <a href="#main-content" class="skip-link">Skip to main content</a>
     <mat-sidenav-container class="app-container" fullscreen>
       <mat-sidenav #sidenav mode="over" [fixedInViewport]="true" class="sidenav">
         <mat-nav-list>
@@ -74,7 +75,7 @@ import { AqiBadgeComponent } from './shared/components/aqi-badge/aqi-badge.compo
           <ca-aqi-badge></ca-aqi-badge>
         </mat-toolbar>
 
-        <main class="app-content" role="main">
+        <main class="app-content" role="main" id="main-content" tabindex="-1">
           <router-outlet></router-outlet>
         </main>
 
@@ -108,6 +109,22 @@ import { AqiBadgeComponent } from './shared/components/aqi-badge/aqi-badge.compo
     </mat-sidenav-container>
   `,
   styles: [`
+    .skip-link {
+      position: absolute;
+      top: -40px;
+      left: 10px;
+      background: #1b5e20;
+      color: #fff;
+      padding: 8px 16px;
+      z-index: 9999;
+      text-decoration: none;
+      font-weight: 700;
+      border-radius: 4px;
+      transition: top 0.2s;
+    }
+    .skip-link:focus {
+      top: 10px;
+    }
     .app-container { height: 100vh; }
     .sidenav { width: 260px; }
     .app-toolbar { position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }

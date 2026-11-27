@@ -18,10 +18,17 @@ logger = structlog.get_logger()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    import asyncio
     logger.info("CleanAir Companion starting up", version=settings.APP_VERSION)
     yield
-    await engine.dispose()
-    await redis_client.aclose()
+    try:
+        await asyncio.wait_for(engine.dispose(), timeout=1.0)
+    except Exception:
+        pass
+    try:
+        await asyncio.wait_for(redis_client.aclose(), timeout=1.0)
+    except Exception:
+        pass
     logger.info("CleanAir Companion shut down cleanly")
 
 

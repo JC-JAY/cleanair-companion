@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     DB_MAX_OVERFLOW: int = 20
 
     # ── Redis ─────────────────────────────────────────────────────────────────
-    REDIS_URL: str = "redis://localhost:6379/0"
+    REDIS_URL: str = "none"
     AQI_CACHE_TTL_SECONDS: int = 300          # 5 minutes
     PLAN_CACHE_TTL_SECONDS: int = 86400       # 24 hours
 
@@ -48,7 +48,7 @@ class Settings(BaseSettings):
     LLM_TEMPERATURE: float = 0.3
 
     # ── Auth ──────────────────────────────────────────────────────────────────
-    SECRET_KEY: SecretStr = Field(..., description="JWT signing secret — RS256 private key PEM")
+    SECRET_KEY: SecretStr = Field(default=SecretStr("dev-secret-key-change-in-production-only-32bytes-min"), description="JWT signing secret")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24       # 24 h
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
@@ -77,8 +77,8 @@ class Settings(BaseSettings):
     @field_validator("DATABASE_URL")
     @classmethod
     def validate_db_url(cls, v: str) -> str:
-        if not v.startswith("postgresql+asyncpg://"):
-            raise ValueError("DATABASE_URL must use postgresql+asyncpg driver")
+        if not (v.startswith("postgresql+asyncpg://") or v.startswith("sqlite+aiosqlite://")):
+            raise ValueError("DATABASE_URL must use postgresql+asyncpg or sqlite+aiosqlite driver")
         return v
 
 
