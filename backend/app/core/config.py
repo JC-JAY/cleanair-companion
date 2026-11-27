@@ -1,6 +1,7 @@
 """Application settings — loaded from environment variables via Pydantic Settings."""
 from __future__ import annotations
 
+import secrets
 from typing import Literal
 
 from pydantic import AnyHttpUrl, Field, SecretStr, field_validator
@@ -22,7 +23,7 @@ class Settings(BaseSettings):
     ENVIRONMENT: Literal["development", "staging", "production"] = "development"
     LOG_LEVEL: str = "INFO"
     API_V1_STR: str = "/api/v1"
-    ALLOWED_ORIGINS: list[str] = ["http://localhost:4200"]
+    ALLOWED_ORIGINS: list[str] = ["http://localhost:4200", "https://cleanair-companion.vercel.app"]
 
     # ── Database ──────────────────────────────────────────────────────────────
     DATABASE_URL: str = "postgresql+asyncpg://cleanair:cleanair@localhost:5432/cleanair"
@@ -48,7 +49,10 @@ class Settings(BaseSettings):
     LLM_TEMPERATURE: float = 0.3
 
     # ── Auth ──────────────────────────────────────────────────────────────────
-    SECRET_KEY: SecretStr = Field(default=SecretStr("dev-secret-key-change-in-production-only-32bytes-min"), description="JWT signing secret")
+    SECRET_KEY: SecretStr = Field(
+        default_factory=lambda: SecretStr(secrets.token_urlsafe(32)),
+        description="JWT signing secret — securely generated if not set via environment",
+    )
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24       # 24 h
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30

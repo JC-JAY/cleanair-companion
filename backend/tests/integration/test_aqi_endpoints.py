@@ -11,13 +11,17 @@ from app.core.security import get_current_user_optional
 from app.schemas.aqi import AQIResponse, AQISource
 from datetime import datetime, timezone
 
-# Override DB and Redis dependencies for isolated integration tests
-async def _dummy_db():
-    yield None
 
-app.dependency_overrides[get_db] = _dummy_db
-app.dependency_overrides[get_redis] = lambda: None
-app.dependency_overrides[get_current_user_optional] = lambda: None
+@pytest.fixture(autouse=True)
+def override_test_dependencies():
+    async def _dummy_db():
+        yield None
+
+    app.dependency_overrides[get_db] = _dummy_db
+    app.dependency_overrides[get_redis] = lambda: None
+    app.dependency_overrides[get_current_user_optional] = lambda: None
+    yield
+    app.dependency_overrides.clear()
 
 
 @pytest.fixture

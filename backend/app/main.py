@@ -23,12 +23,12 @@ async def lifespan(app: FastAPI):
     yield
     try:
         await asyncio.wait_for(engine.dispose(), timeout=1.0)
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("Database engine cleanup notice", error=str(exc))
     try:
         await asyncio.wait_for(redis_client.aclose(), timeout=1.0)
-    except Exception:
-        pass
+    except Exception as exc:
+        logger.debug("Cache connection cleanup notice", error=str(exc))
     logger.info("CleanAir Companion shut down cleanly")
 
 
